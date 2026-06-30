@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import StreamForm from "../components/StreamForm.jsx";
 import StreamItem from "../components/StreamItem.jsx";
-import StreamStats from "../components/StreamStats.jsx";
 
 const emptyFormData = {
   title: "",
@@ -22,22 +21,6 @@ function StreamList() {
   const [streamItems, setStreamItems] = useState([]);
   const [formData, setFormData] = useState(emptyFormData);
   const [editingId, setEditingId] = useState(null);
-  const [filter, setFilter] = useState("all");
-
-  const completedItems = streamItems.filter((item) => item.isCompleted).length;
-  const pendingItems = streamItems.length - completedItems;
-
-  const visibleItems = useMemo(() => {
-    if (filter === "completed") {
-      return streamItems.filter((item) => item.isCompleted);
-    }
-
-    if (filter === "pending") {
-      return streamItems.filter((item) => !item.isCompleted);
-    }
-
-    return streamItems;
-  }, [filter, streamItems]);
 
   function handleInputChange(event) {
     const { name, value } = event.target;
@@ -74,14 +57,10 @@ function StreamList() {
       setStreamItems((currentItems) => {
         return currentItems.map((item) => {
           if (item.id === editingId) {
-            const updatedItem = {
+            return {
               ...item,
-              ...cleanedItem,
-              updatedAt: new Date().toLocaleString()
+              ...cleanedItem
             };
-
-            console.log("StreamList item updated:", updatedItem);
-            return updatedItem;
           }
 
           return item;
@@ -114,8 +93,6 @@ function StreamList() {
       priority: item.priority,
       notes: item.notes
     });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleDeleteItem(itemId) {
@@ -143,12 +120,6 @@ function StreamList() {
     });
   }
 
-  function handleClearCompleted() {
-    setStreamItems((currentItems) => {
-      return currentItems.filter((item) => !item.isCompleted);
-    });
-  }
-
   return (
     <section className="streamListPage">
       <section className="introCard">
@@ -157,17 +128,10 @@ function StreamList() {
         <h2>StreamList</h2>
 
         <p>
-          Add movies or programs you want to watch later. Your entries will
-          display on the page, and you can edit, delete, or mark each item as
-          complete.
+          Add movies or programs you want to watch later. Once submitted, each
+          item will display below as part of your personal watch list.
         </p>
       </section>
-
-      <StreamStats
-        totalItems={streamItems.length}
-        completedItems={completedItems}
-        pendingItems={pendingItems}
-      />
 
       <StreamForm
         formData={formData}
@@ -183,47 +147,11 @@ function StreamList() {
             <p className="smallLabel">Saved User Inputs</p>
             <h2>Your Watch List</h2>
           </div>
-
-          <div className="listControls">
-            <button
-              className={filter === "all" ? "filterButton activeFilter" : "filterButton"}
-              type="button"
-              onClick={() => setFilter("all")}
-            >
-              All
-            </button>
-
-            <button
-              className={filter === "pending" ? "filterButton activeFilter" : "filterButton"}
-              type="button"
-              onClick={() => setFilter("pending")}
-            >
-              Pending
-            </button>
-
-            <button
-              className={filter === "completed" ? "filterButton activeFilter" : "filterButton"}
-              type="button"
-              onClick={() => setFilter("completed")}
-            >
-              Completed
-            </button>
-
-            <button
-              className="clearButton"
-              type="button"
-              onClick={handleClearCompleted}
-              disabled={completedItems === 0}
-            >
-              <span className="material-symbols-outlined">cleaning_services</span>
-              Clear Completed
-            </button>
-          </div>
         </div>
 
-        {visibleItems.length > 0 ? (
+        {streamItems.length > 0 ? (
           <div className="itemsList">
-            {visibleItems.map((item) => {
+            {streamItems.map((item) => {
               return (
                 <StreamItem
                   key={item.id}
@@ -238,8 +166,8 @@ function StreamList() {
         ) : (
           <div className="emptyState">
             <span className="material-symbols-outlined">playlist_add</span>
-            <h3>No items added yet.</h3>
-            <p>Add a movie or program above to begin your StreamList.</p>
+            <h3>No movies or programs added yet.</h3>
+            <p>Add an item above and it will display here.</p>
           </div>
         )}
       </section>
