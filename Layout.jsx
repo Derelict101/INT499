@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
+import PwaInstallButton from "./PwaInstallButton.jsx";
 
 function Layout() {
   return (
@@ -8,6 +9,7 @@ function Layout() {
 
       <main className="mainContent">
         <Outlet />
+        <PwaInstallButton />
       </main>
 
       <footer className="footer">
